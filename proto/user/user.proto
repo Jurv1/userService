@@ -7,6 +7,7 @@ option go_package = "bushmanov.userv1;userv1";
 service UserService {
   rpc GetUser (GetUserRequest) returns (GetUserResponse);
   rpc CreateUser (CreateUserRequest) returns (CreateUserResponse);
+  rpc MutateUser  (MutateUserRequest) returns (MutateUserResponse);
 }
 
 message GetUserRequest {
@@ -27,4 +28,12 @@ message CreateUserRequest {
 
 message CreateUserResponse {
   string id = 1;
+}
+
+message MutateUserRequest {
+  string info = 1;
+}
+
+message MutateUserResponse {
+  string message = 1;
 }

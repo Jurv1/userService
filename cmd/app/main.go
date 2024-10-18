@@ -52,6 +52,13 @@ func (s *server) CreateUser(ctx context.Context, in *userv1.CreateUserRequest) (
 	}, nil
 }
 
+func (s *server) MutateUser(ctx context.Context, in *userv1.MutateUserRequest) (*userv1.MutateUserResponse, error) {
+	log.Println(in)
+	return &userv1.MutateUserResponse{
+		Message: fmt.Sprintf("Test %s", in.GetInfo()),
+	}, nil
+}
+
 func main() {
 	lis, err := net.Listen("tcp", ":8080")
 
