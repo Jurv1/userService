@@ -1,65 +1,29 @@
 package main
 
 import (
-	"context"
-	"fmt"
-	userv1 "github.com/Jurv1/userService/proto/gen/go/user"
+	"github.com/Jurv1/userService/database"
+	repository2 "github.com/Jurv1/userService/internal/repository"
+	"github.com/Jurv1/userService/internal/usecase"
+	grpc2 "github.com/Jurv1/userService/internal/user/grpc"
+	"github.com/jackc/pgx"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/encoding/protojson"
 	"log"
-	"math/rand"
 	"net"
-	"strconv"
 )
 
-type server struct {
-	userv1.UnimplementedUserServiceServer
-}
-
-func ConvertToJSON(message *userv1.CreateUserRequest) (string, error) {
-	jsonBytes, err := protojson.Marshal(message)
-	if err != nil {
-		return "", err
-	}
-	return string(jsonBytes), nil
-}
-
-func (s *server) GetUser(ctx context.Context, in *userv1.GetUserRequest) (*userv1.GetUserResponse, error) {
-	log.Println("GetUser")
-	if in.Id == 228 {
-		return nil, status.Errorf(codes.InvalidArgument, "request missing required field: Name")
-	}
-	return &userv1.GetUserResponse{
-		Id:    0,
-		Name:  "Testing",
-		Email: "Test",
-	}, nil
-}
-
-func (s *server) CreateUser(ctx context.Context, in *userv1.CreateUserRequest) (*userv1.CreateUserResponse, error) {
-	log.Println(in)
-	jsonData, err := protojson.Marshal(&userv1.CreateUserResponse{
-		Id: strconv.Itoa(int(rand.Int63())),
-	})
-	if err != nil {
-		log.Fatalf("failed to marshal to JSON: %v", err)
-	}
-	fmt.Println(string(jsonData))
-	return &userv1.CreateUserResponse{
-		Id: strconv.Itoa(228),
-	}, nil
-}
-
-func (s *server) MutateUser(ctx context.Context, in *userv1.MutateUserRequest) (*userv1.MutateUserResponse, error) {
-	log.Println(in)
-	return &userv1.MutateUserResponse{
-		Message: fmt.Sprintf("Test %s", in.GetInfo()),
-	}, nil
-}
-
 func main() {
+	db := database.GetNewDB()
+	defer func(db *pgx.Conn) {
+		err := db.Close()
+		if err != nil {
+
+		}
+	}(db)
+
+	ur := repository2.NewUserRepo(db)
+	uq := repository2.NewUserQRepo(db)
+	uu := usecase.NewUserUseCase(ur, uq)
+
 	lis, err := net.Listen("tcp", ":8080")
 
 	if err != nil {
@@ -67,8 +31,7 @@ func main() {
 	}
 
 	grpcServer := grpc.NewServer()
-
-	userv1.RegisterUserServiceServer(grpcServer, &server{})
+	grpc2.NewUserServerGrpc(grpcServer, uu)
 
 	err = grpcServer.Serve(lis)
 	if err != nil {
