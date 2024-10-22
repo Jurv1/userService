@@ -2,9 +2,9 @@ package main
 
 import (
 	"github.com/Jurv1/userService/database"
+	grpc2 "github.com/Jurv1/userService/internal/delivery/grpc"
 	repository2 "github.com/Jurv1/userService/internal/repository"
 	"github.com/Jurv1/userService/internal/usecase"
-	grpc2 "github.com/Jurv1/userService/internal/user/grpc"
 	"github.com/jackc/pgx"
 	"google.golang.org/grpc"
 	"log"

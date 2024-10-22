@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"github.com/Jurv1/userService/models"
+	"github.com/Jurv1/userService/internal/models"
 	"github.com/jackc/pgx"
 )
 

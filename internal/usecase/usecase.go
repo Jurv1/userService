@@ -1,8 +1,8 @@
 package usecase
 
 import (
+	"github.com/Jurv1/userService/internal/models"
 	repository2 "github.com/Jurv1/userService/internal/repository"
-	"github.com/Jurv1/userService/models"
 )
 
 type UserUseCase interface {
